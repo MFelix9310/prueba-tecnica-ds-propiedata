@@ -13,11 +13,9 @@ env/
 **/.ipynb_checkpoints/
 
 # Outputs grandes
-output/*.parquet
-output/*.gpkg
-output/*.pkl
-output/models/
+output/*
 !output/.gitkeep
+!output/dataset_unificado.parquet
 
 # IDE
 .vscode/
