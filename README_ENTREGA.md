@@ -13,6 +13,7 @@ python -m venv .venv
 pip install -r requirements.txt
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_limpieza.ipynb
 jupyter nbconvert --to notebook --execute --inplace notebooks/02_modelado.ipynb
+pytest tests/                     # validacion del parquet de salida
 ```
 
 Para ver los runs de MLflow después:
@@ -27,13 +28,16 @@ Y abrir `http://localhost:5000`.
 
 - `notebooks/00_eda.ipynb` — exploración previa de los 3 CSVs. No es entregable formal pero queda por si te interesa el camino.
 - `notebooks/01_limpieza.ipynb` — Tarea 1. Limpieza por plataforma, schema target, unificación. Resumen al final.
-- `notebooks/02_modelado.ipynb` — Tarea 2. Tres modelos comparados (Ridge, HistGradientBoosting, XGBoost), MLflow tracking, análisis de errores, resumen al final.
+- `notebooks/02_modelado.ipynb` — Tarea 2. Tres modelos comparados (Ridge, HistGradientBoosting, XGBoost) más un experimento extra de HGB con `log1p(target)`. MLflow tracking, análisis de errores, resumen al final.
 - `output/dataset_unificado.parquet` — salida de la Tarea 1.
+- `tests/test_dataset_unificado.py` — validaciones sobre el parquet (`pytest tests/`).
 - `PROPUESTA.md` — Parte B. Las 4 áreas restantes con priorización a un mes.
 
 ## Resultados
 
-HistGradientBoosting ganó en test (split temporal con cutoff 2025-05-15): R² = 0.857, RMSE ≈ 256k, MAE ≈ 167k, MAPE ≈ 17.96%. XGBoost quedó en R² = 0.815, Ridge sirvió de piso (R² = 0.755). El detalle vive en `02_modelado.ipynb`.
+HistGradientBoosting ganó en test (split temporal con cutoff 2025-05-15): R² = 0.857, RMSE ≈ 256k, MAE ≈ 167k, MAPE ≈ 17.96%. XGBoost quedó en R² = 0.815, Ridge sirvió de piso (R² = 0.755).
+
+Sumé un experimento extra entrenando el mismo HGB con `log1p` del target (y `expm1` para volver). R² queda igual (0.856) pero el MAPE baja a **17.07%** y el MAE a 165k, atacando el cuartil bajo de precio que era el segmento más débil. Para un producto de estimación inmobiliaria donde el usuario piensa en porcentajes, ese es el modelo que iría a producción.
 
 ## Lo que no llegué a hacer
 
